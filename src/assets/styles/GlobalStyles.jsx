@@ -117,10 +117,22 @@ const GlobalStyles = createGlobalStyle`
     gap: 1rem;
   }
 
+  .grid{
+    display: grid;
+    gap: 1rem;
+  }
+
   .cursor-pointer{
     cursor: pointer;
   }
 
+  .text-red{
+    color: #ff0000;
+  }
+
+  .fw-bold{
+    font-weight: bold
+  }
 
   /* Remove all animations, transitions and smooth scroll for people that prefer not to see them */
   @media (prefers-reduced-motion: reduce) {

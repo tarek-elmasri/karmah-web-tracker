@@ -1,4 +1,5 @@
 import React from "react";
+import { navigate } from "gatsby";
 import styled, { ThemeProvider } from "styled-components";
 import GlobalStyles from "../assets/styles/GlobalStyles";
 import Navbar from "./Navbar";
@@ -6,6 +7,8 @@ import Sidebar from "./Sidebar";
 
 import "react-datepicker/dist/react-datepicker.css";
 import mixins from "../assets/styles/mixins";
+// import { isLoggedIn } from "../services/auth";
+import useAuth from "../hooks/useAuth";
 
 const StyledLayout = styled.div`
   min-height: 100vh;
@@ -25,6 +28,12 @@ const StyledLayout = styled.div`
   }
 `;
 const Layout = ({ children }) => {
+  const { isLoggedIn, getUser, logout } = useAuth();
+  if (!isLoggedIn()) {
+    navigate("/login");
+    return null;
+  }
+
   return (
     <div id="root" dir="rtl">
       <ThemeProvider theme={mixins}>
@@ -37,7 +46,7 @@ const Layout = ({ children }) => {
 
           <div>
             <header>
-              <Navbar />
+              <Navbar user={getUser()} logout={logout} />
             </header>
             <main className="p-2">{children}</main>
           </div>

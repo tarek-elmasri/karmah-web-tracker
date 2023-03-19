@@ -1,27 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Button from "../../components/Button";
 import Layout from "../../components/Layout";
 import StyledTable from "../../components/StyledTable";
 import Loader from "../../components/Loader";
-import { fetchAreas } from "../../utils/mockData";
 import { navigate } from "gatsby";
+import useApi from "../../hooks/useApi";
 
 const Areas = () => {
-  const [areas, setAreas] = useState([]);
-
-  const [isLoading, setIsLoading] = useState(false);
-
+  const { getAreas, isLoading, isError, data: areas } = useApi([])
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      const data = await fetchAreas();
-      setAreas(data);
-      setIsLoading(false);
-    };
-
-    fetchData();
-
-    return () => {};
+    getAreas()
+    return () => { };
   }, []);
 
   return (

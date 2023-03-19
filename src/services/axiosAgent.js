@@ -13,13 +13,13 @@ const axiosAgent = axios.create({
   baseURL: SERVER_BASE_URL,
 });
 
-axiosInstance.defaults.headers.common["Content-Type"] =
+axiosAgent.defaults.headers.common["Content-Type"] =
   "application/json; charset=utf-8";
-axiosInstance.defaults.headers.common["Accept"] =
+axiosAgent.defaults.headers.common["Accept"] =
   "application/json; charset=utf-8";
 
 // adding access token to requests if present
-axiosInstance.interceptors.request.use((req) => {
+axiosAgent.interceptors.request.use((req) => {
   const access_token = getAccessToken();
   if (access_token) {
     req.headers["Authorization"] = `Bearer ${access_token}`;
@@ -28,7 +28,7 @@ axiosInstance.interceptors.request.use((req) => {
 });
 
 // intercepting expired token
-axiosInstance.interceptors.response.use(
+axiosAgent.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (
@@ -40,7 +40,7 @@ axiosInstance.interceptors.response.use(
       try {
         const { data: tokens } = await fetchNewTokens(getRefreshToken());
         setTokens(tokens);
-        return axiosInstance.request(error.config);
+        return axiosAgent.request(error.config);
       } catch (err) {
         handleLogout();
         return Promise.reject(err);

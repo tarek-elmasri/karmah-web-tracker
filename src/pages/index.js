@@ -1,15 +1,27 @@
 import { navigate } from "gatsby";
-import React from "react";
-import Button from "../../../components/Button";
-import Layout from "../../../components/Layout";
-import StyledTable from "../../../components/StyledTable";
-import { mockPlans } from "../../../utils/mockData";
+import React, { useEffect } from "react";
+import Button from "../components/Button";
+import Layout from "../components/Layout";
+import Loader from "../components/Loader";
+import StyledTable from "../components/StyledTable";
+import useApi from "../hooks/useApi";
+import { calculateDaysBetweenDates } from '../utils/dates'
+// import { mockPlans } from "../utils/mockData";
 
-const Plans = () => {
-  const data = mockPlans;
+const Index = () => {
+  // const data = mockPlans;
+
+  const { getPlans, isLoading, isError, data: plans } = useApi([])
+
+  useEffect(() => {
+    getPlans()
+    return () => {
+    }
+  }, [])
 
   return (
     <Layout>
+      {isLoading && <Loader />}
       <div>
         <h1>خطط السير</h1>
         <hr />
@@ -18,6 +30,10 @@ const Plans = () => {
           جديد
         </Button>
 
+        {
+          isError &&
+          <p className="text-red fw-bold">حدث خطأ أثناء الاتصال بالسيرفر. الرجاء المحاولة مرة اخرى</p>
+        }
         <StyledTable className="m-block-2">
           <thead>
             <tr>
@@ -30,16 +46,21 @@ const Plans = () => {
             </tr>
           </thead>
           <tbody>
-            {data.map((plan) => (
+            {plans.length ? plans.map((plan) => (
               <tr key={plan.id}>
                 <td>{plan.area.name}</td>
-                <td>{plan.startDate}</td>
-                <td>{plan.endDate}</td>
+                <td>{plan.start_date}</td>
+                <td>{plan.end_date}</td>
                 <td>{plan.user.name}</td>
                 <td>{plan.plan_accounts.length}</td>
-                <td>{plan.days}</td>
+                <td>{calculateDaysBetweenDates(plan.start_date, plan.end_date)}</td>
               </tr>
-            ))}
+            ))
+              :
+              <tr>
+                <td colSpan={7}>لا يوجد بيانات</td>
+              </tr>
+            }
           </tbody>
         </StyledTable>
       </div>
@@ -47,4 +68,4 @@ const Plans = () => {
   );
 };
 
-export default Plans;
+export default Index;

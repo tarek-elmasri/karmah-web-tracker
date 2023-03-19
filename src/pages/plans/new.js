@@ -5,9 +5,9 @@ import Layout from "../../components/Layout";
 import Loader from "../../components/Loader";
 import StyledTable from "../../components/StyledTable";
 import { calculateDaysBetweenDates, formatDate } from "../../utils/dates";
-import { fetchAreas } from "../../utils/mockData";
 import { GrFormClose } from "react-icons/gr";
 import { navigate } from "gatsby";
+import useApi from "../../hooks/useApi";
 
 const StyledNewPlan = styled.section`
   textarea {
@@ -21,26 +21,23 @@ const StyledNewPlan = styled.section`
   }
 `;
 
-const NewPlan = (props) => {
+const NewPlan = () => {
   const todayDate = new Date();
   const [plan, setPlan] = useState({
     area_id: "",
-    startDate: formatDate(todayDate),
-    endDate: formatDate(todayDate),
-    days: 0,
-    plan_accounts: [],
+    start_date: formatDate(todayDate),
+    end_date: formatDate(todayDate),
+    plan_accounts_attributes: [],
   });
 
-  console.log(props);
-  const [areas, setAreas] = useState([]);
-  const [accounts, setAccounts] = useState([]);
+  const { isLoading: isAreasLoading, isError: isAreasErrors, getAreas, data: areas } = useApi([])
+  const { isLoading: isPlanLoading, isError: isPlanError, createPlan } = useApi()
 
+  const [accounts, setAccounts] = useState([]);
   const [accountForm, setAccountForm] = useState({
     id: "",
     objective: "",
   });
-
-  const [isLoading, setIsLoading] = useState(true);
 
   // find area by id
   const selectAreaById = useCallback(
@@ -49,25 +46,23 @@ const NewPlan = (props) => {
   );
 
   useEffect(() => {
-    // fetching areas including accounts then sets initial form data
-    const fetchData = async () => {
-      setIsLoading(true);
-      const data = (await fetchAreas()) || [];
-      setAreas(data); // setting areas state
-      setAccounts(data[0]?.accounts || []); // separate accounts into individual state to facilitate filtering
-      setAccountForm((prev) => ({ ...prev, id: data[0]?.accounts[0]?.id })); // setting add Account form state
-      setPlan((prev) => ({ ...prev, area_id: data[0]?.id })); // setting new plan states
-      setIsLoading(false);
-    };
 
-    fetchData();
-    return () => {};
+    setAccounts(areas[0]?.accounts || []); // separate accounts into individual state to facilitate filtering
+    setAccountForm((prev) => ({ ...prev, id: areas[0]?.accounts[0]?.id })); // setting add Account form state
+    setPlan((prev) => ({ ...prev, area_id: areas[0]?.id })); // setting new plan states
+
+  }, [areas])
+
+
+  useEffect(() => {
+    getAreas()
+
   }, []);
 
   useEffect(() => {
     const newArea = selectAreaById(plan.area_id);
     setAccounts(newArea?.accounts);
-    setPlan((prev) => ({ ...prev, plan_accounts: [] }));
+    setPlan((prev) => ({ ...prev, plan_accounts_attributes: [] }));
     setAccountForm({ id: newArea?.accounts[0]?.id, objective: "" });
   }, [plan.area_id, selectAreaById]);
 
@@ -81,9 +76,9 @@ const NewPlan = (props) => {
   );
 
   useEffect(() => {
-    if (calculateDaysBetweenDates(plan.startDate, plan.endDate) < 0)
-      setPlan((prev) => ({ ...prev, endDate: plan.startDate }));
-  }, [plan.startDate, plan.endDate]);
+    if (calculateDaysBetweenDates(plan.start_date, plan.end_date) < 0)
+      setPlan((prev) => ({ ...prev, end_date: plan.start_date }));
+  }, [plan.start_date, plan.end_date]);
 
   const handleAddAccount = () => {
     const newAccount = selectAccountById(accountForm.id);
@@ -93,8 +88,8 @@ const NewPlan = (props) => {
 
     setPlan((prev) => ({
       ...prev,
-      plan_accounts: [
-        ...plan.plan_accounts,
+      plan_accounts_attributes: [
+        ...plan.plan_accounts_attributes,
         {
           id: newAccount.id,
           name: newAccount.name,
@@ -110,7 +105,7 @@ const NewPlan = (props) => {
   const handleRemoveAccount = (account) => {
     setPlan((prev) => ({
       ...prev,
-      plan_accounts: plan.plan_accounts.filter((acc) => acc.id !== account.id),
+      plan_accounts_attributes: plan.plan_accounts_attributes.filter((acc) => acc.id !== account.id),
     }));
 
     setAccounts((prev) => [...prev, { id: account.id, name: account.name }]);
@@ -130,7 +125,7 @@ const NewPlan = (props) => {
 
   return (
     <Layout>
-      {isLoading ? (
+      {isAreasLoading ? (
         <Loader />
       ) : (
         <StyledNewPlan>
@@ -152,23 +147,23 @@ const NewPlan = (props) => {
             </select>
           </div>
           <div className="form-group">
-            <label htmlFor="startDate">من</label>
+            <label htmlFor="start_date">من</label>
             <input
-              id="startDate"
-              name="startDate"
-              value={plan.startDate}
+              id="start_date"
+              name="start_date"
+              value={plan.start_date}
               min={formatDate(todayDate)}
               onChange={handlePlanChange}
               type="date"
             />
           </div>
           <div className="form-group">
-            <label htmlFor="endDate">الى</label>
+            <label htmlFor="end_date">الى</label>
             <input
-              id="endDate"
-              name="endDate"
-              value={plan.endDate}
-              min={plan.startDate}
+              id="end_date"
+              name="end_date"
+              value={plan.end_date}
+              min={plan.start_date}
               onChange={handlePlanChange}
               type="date"
             />
@@ -178,7 +173,7 @@ const NewPlan = (props) => {
             <input
               id="days"
               name="days"
-              value={calculateDaysBetweenDates(plan.startDate, plan.endDate)}
+              value={calculateDaysBetweenDates(plan.start_date, plan.end_date)}
               // onChange={handlePlanChange}
               type="number"
               disabled
@@ -202,7 +197,7 @@ const NewPlan = (props) => {
                 }))
               }
             >
-              {accounts.map((account, i) => (
+              {accounts?.map((account, i) => (
                 <option key={`acc${i}`} value={account.id}>
                   {account.name}
                 </option>
@@ -239,8 +234,8 @@ const NewPlan = (props) => {
               </tr>
             </thead>
             <tbody>
-              {plan.plan_accounts.length ? (
-                plan.plan_accounts.map((acc) => (
+              {plan.plan_accounts_attributes.length ? (
+                plan.plan_accounts_attributes.map((acc) => (
                   <tr key={acc.id}>
                     <td>{acc.name}</td>
                     <td>{acc.objective}</td>

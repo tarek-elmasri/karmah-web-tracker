@@ -64,7 +64,7 @@ const StyledNav = styled.nav`
   }
 `;
 
-const Navbar = () => {
+const Navbar = ({ user, logout }) => {
   return (
     <StyledNav>
       <div className="logo">
@@ -75,11 +75,11 @@ const Navbar = () => {
       </div>
 
       <div className="username">
-        <p>اسم المستخدم</p>
+        <p>{user.fullname}</p>
       </div>
 
       <div className="user">
-        <div className="rounded-btn">
+        <div className="rounded-btn" onClick={logout}>
           <ImSwitch size="1rem" color="red" />
         </div>
       </div>
