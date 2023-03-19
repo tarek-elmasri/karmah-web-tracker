@@ -30,8 +30,18 @@ const NewPlan = () => {
     plan_accounts_attributes: [],
   });
 
-  const { isLoading: isAreasLoading, isError: isAreasErrors, getAreas, data: areas } = useApi([])
-  const { isLoading: isPlanLoading, isError: isPlanError, createPlan } = useApi()
+  const {
+    isLoading: isAreasLoading,
+    isError: isAreasErrors,
+    getAreas,
+    data: areas,
+  } = useApi([]);
+  const {
+    isLoading: isPlanLoading,
+    isError: isPlanError,
+    error: planErros,
+    createPlan,
+  } = useApi();
 
   const [accounts, setAccounts] = useState([]);
   const [accountForm, setAccountForm] = useState({
@@ -46,17 +56,13 @@ const NewPlan = () => {
   );
 
   useEffect(() => {
-
     setAccounts(areas[0]?.accounts || []); // separate accounts into individual state to facilitate filtering
     setAccountForm((prev) => ({ ...prev, id: areas[0]?.accounts[0]?.id })); // setting add Account form state
     setPlan((prev) => ({ ...prev, area_id: areas[0]?.id })); // setting new plan states
-
-  }, [areas])
-
+  }, [areas]);
 
   useEffect(() => {
-    getAreas()
-
+    getAreas();
   }, []);
 
   useEffect(() => {
@@ -91,7 +97,7 @@ const NewPlan = () => {
       plan_accounts_attributes: [
         ...plan.plan_accounts_attributes,
         {
-          id: newAccount.id,
+          account_id: newAccount.id,
           name: newAccount.name,
           objective: accountForm.objective,
         },
@@ -105,7 +111,9 @@ const NewPlan = () => {
   const handleRemoveAccount = (account) => {
     setPlan((prev) => ({
       ...prev,
-      plan_accounts_attributes: plan.plan_accounts_attributes.filter((acc) => acc.id !== account.id),
+      plan_accounts_attributes: plan.plan_accounts_attributes.filter(
+        (acc) => acc.account_id !== account.id
+      ),
     }));
 
     setAccounts((prev) => [...prev, { id: account.id, name: account.name }]);
@@ -121,11 +129,20 @@ const NewPlan = () => {
     setPlan((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleCreatePlan = async () => {
+    try {
+      const data = await createPlan(plan);
+      navigate("/");
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   const accountFormIsValid = accounts?.length && accountForm.objective.length;
 
   return (
     <Layout>
-      {isAreasLoading ? (
+      {isAreasLoading || isPlanLoading ? (
         <Loader />
       ) : (
         <StyledNewPlan>
@@ -236,7 +253,7 @@ const NewPlan = () => {
             <tbody>
               {plan.plan_accounts_attributes.length ? (
                 plan.plan_accounts_attributes.map((acc) => (
-                  <tr key={acc.id}>
+                  <tr key={acc.account_id}>
                     <td>{acc.name}</td>
                     <td>{acc.objective}</td>
                     <td>
@@ -256,7 +273,7 @@ const NewPlan = () => {
           </StyledTable>
 
           <div className="flex">
-            <Button className="success" onClick={() => console.log(plan)}>
+            <Button className="success" onClick={handleCreatePlan}>
               حفظ
             </Button>
             <Button onClick={() => navigate("/")}>عودة</Button>

@@ -5,19 +5,18 @@ import Layout from "../components/Layout";
 import Loader from "../components/Loader";
 import StyledTable from "../components/StyledTable";
 import useApi from "../hooks/useApi";
-import { calculateDaysBetweenDates } from '../utils/dates'
+import { calculateDaysBetweenDates } from "../utils/dates";
 // import { mockPlans } from "../utils/mockData";
 
 const Index = () => {
   // const data = mockPlans;
 
-  const { getPlans, isLoading, isError, data: plans } = useApi([])
+  const { getPlans, isLoading, isError, data: plans } = useApi([]);
 
   useEffect(() => {
-    getPlans()
-    return () => {
-    }
-  }, [])
+    getPlans();
+    return () => {};
+  }, []);
 
   return (
     <Layout>
@@ -30,10 +29,11 @@ const Index = () => {
           جديد
         </Button>
 
-        {
-          isError &&
-          <p className="text-red fw-bold">حدث خطأ أثناء الاتصال بالسيرفر. الرجاء المحاولة مرة اخرى</p>
-        }
+        {isError && (
+          <p className="text-red fw-bold">
+            حدث خطأ أثناء الاتصال بالسيرفر. الرجاء المحاولة مرة اخرى
+          </p>
+        )}
         <StyledTable className="m-block-2">
           <thead>
             <tr>
@@ -46,21 +46,24 @@ const Index = () => {
             </tr>
           </thead>
           <tbody>
-            {plans.length ? plans.map((plan) => (
-              <tr key={plan.id}>
-                <td>{plan.area.name}</td>
-                <td>{plan.start_date}</td>
-                <td>{plan.end_date}</td>
-                <td>{plan.user.name}</td>
-                <td>{plan.plan_accounts.length}</td>
-                <td>{calculateDaysBetweenDates(plan.start_date, plan.end_date)}</td>
-              </tr>
-            ))
-              :
+            {plans.length ? (
+              plans.map((plan) => (
+                <tr key={plan.id}>
+                  <td>{plan.area.name}</td>
+                  <td>{plan.start_date}</td>
+                  <td>{plan.end_date}</td>
+                  <td>{plan.user.fullname}</td>
+                  <td>{plan.plan_accounts.length}</td>
+                  <td>
+                    {calculateDaysBetweenDates(plan.start_date, plan.end_date)}
+                  </td>
+                </tr>
+              ))
+            ) : (
               <tr>
                 <td colSpan={7}>لا يوجد بيانات</td>
               </tr>
-            }
+            )}
           </tbody>
         </StyledTable>
       </div>
