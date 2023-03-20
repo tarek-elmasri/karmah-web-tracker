@@ -148,6 +148,7 @@ const NewPlan = () => {
         <StyledNewPlan>
           <h1>اضافة خطة سير</h1>
           <hr />
+          <br />
           <div className="form-group">
             <label htmlFor="area_id">المنطقة</label>
             <select
@@ -201,7 +202,7 @@ const NewPlan = () => {
           <br />
           <h3>العملاء المستهدفين</h3>
           <hr />
-
+          <br />
           <div className="form-group">
             <label htmlFor="account">العميل :</label>
             <select
@@ -273,7 +274,7 @@ const NewPlan = () => {
           </StyledTable>
 
           <div className="flex">
-            <Button className="success" onClick={handleCreatePlan}>
+            <Button disabled={!plan.plan_accounts_attributes.length} className="success" onClick={handleCreatePlan}>
               حفظ
             </Button>
             <Button onClick={() => navigate("/")}>عودة</Button>

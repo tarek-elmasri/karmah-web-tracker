@@ -6,16 +6,14 @@ import Loader from "../components/Loader";
 import StyledTable from "../components/StyledTable";
 import useApi from "../hooks/useApi";
 import { calculateDaysBetweenDates } from "../utils/dates";
-// import { mockPlans } from "../utils/mockData";
 
 const Index = () => {
-  // const data = mockPlans;
 
   const { getPlans, isLoading, isError, data: plans } = useApi([]);
 
   useEffect(() => {
     getPlans();
-    return () => {};
+    //eslint-disable-next-line
   }, []);
 
   return (
