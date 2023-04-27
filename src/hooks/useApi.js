@@ -97,6 +97,19 @@ const useApi = (initialData = null) => {
     }
   };
 
+  const createUser = async (form) => {
+    try {
+      setIsLoading();
+      const { data } = await userServices.createUser(form);
+      setResponseSuccess(data);
+      return data;
+    } catch (e) {
+      console.log(e);
+      setResponseError(e);
+      return Promise.reject(e);
+    }
+  };
+
   return {
     isLoading: response.isLoading,
     isError: response.isError,
@@ -108,6 +121,7 @@ const useApi = (initialData = null) => {
     createPlan,
     createAccount,
     getUsers,
+    createUser,
   };
 };
 
