@@ -36,6 +36,8 @@ export const isLoggedIn = () => {
   return !!user?.id;
 };
 
+export const isAdmin = !!(getUser()?.role === "admin");
+
 const setUser = (user) => {
   if (isBrowser) ls.set("user", user);
 };

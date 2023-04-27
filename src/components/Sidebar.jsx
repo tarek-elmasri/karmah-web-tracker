@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { Link } from "gatsby";
+import useAuth from "../hooks/useAuth";
 
 const StyledSidebar = styled.div`
   background-color: var(--clr-primary-400);
@@ -32,6 +33,7 @@ const StyledSidebar = styled.div`
 `;
 
 const Sidebar = () => {
+  const { isAdmin } = useAuth();
   return (
     <StyledSidebar>
       <div className="logo">logo</div>
@@ -47,6 +49,11 @@ const Sidebar = () => {
       <Link className="tab" to="/accounts" activeClassName="active">
         <p>العملاء</p>
       </Link>
+      {isAdmin && (
+        <Link className="tab" to="/users/main" activeClassName="active">
+          <p>الموظفين</p>
+        </Link>
+      )}
     </StyledSidebar>
   );
 };

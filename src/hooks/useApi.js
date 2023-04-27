@@ -1,7 +1,8 @@
 import { useState } from "react";
 import * as areaServices from "../services/areas";
 import * as planServices from "../services/plans";
-import * as accountServices from '../services/accounts'
+import * as accountServices from "../services/accounts";
+import * as userServices from "../services/users";
 
 const useApi = (initialData = null) => {
   const [response, setResponse] = useState({
@@ -74,7 +75,7 @@ const useApi = (initialData = null) => {
 
   const createAccount = async (form) => {
     try {
-      setIsLoading()
+      setIsLoading();
       const { data } = await accountServices.createAccount(form);
       setResponseSuccess(data);
       return data;
@@ -83,7 +84,18 @@ const useApi = (initialData = null) => {
       setResponseError(e);
       return Promise.reject(e);
     }
-  }
+  };
+
+  const getUsers = async () => {
+    try {
+      setIsLoading();
+      const { data } = await userServices.getUsers();
+      setResponseSuccess(data);
+    } catch (e) {
+      console.log(e);
+      setResponseError(e);
+    }
+  };
 
   return {
     isLoading: response.isLoading,
@@ -94,7 +106,8 @@ const useApi = (initialData = null) => {
     createArea,
     getPlans,
     createPlan,
-    createAccount
+    createAccount,
+    getUsers,
   };
 };
 

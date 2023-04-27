@@ -1,36 +1,47 @@
-import { useState } from 'react'
-import { navigate } from 'gatsby'
-import { getUser, handleLogin, handleLogout, handleRegister, isLoggedIn } from '../services/auth'
+import { useState } from "react";
+import { navigate } from "gatsby";
+import {
+  getUser,
+  handleLogin,
+  handleLogout,
+  handleRegister,
+  isLoggedIn,
+  isAdmin,
+} from "../services/auth";
 
 const useAuth = () => {
-  const [response, setResponse] = useState({ isLoading: false, isError: false, error: null })
+  const [response, setResponse] = useState({
+    isLoading: false,
+    isError: false,
+    error: null,
+  });
 
   const login = async (form, returnUrl = "/") => {
     try {
-      setResponse({ isLoading: true, isError: false, error: null })
-      await handleLogin(form)
-      navigate(returnUrl)
+      setResponse({ isLoading: true, isError: false, error: null });
+      await handleLogin(form);
+      navigate(returnUrl);
     } catch (e) {
-      console.log(e)
-      setResponse({ isLoading: false, isError: true, error: e })
+      console.log(e);
+      setResponse({ isLoading: false, isError: true, error: e });
     }
-  }
+  };
 
   const createUser = async (form, returnUrl = "/") => {
     try {
-      setResponse({ isLoading: true, isError: false, error: null })
-      await handleRegister(form)
-      navigate(returnUrl)
+      setResponse({ isLoading: true, isError: false, error: null });
+      await handleRegister(form);
+      navigate(returnUrl);
     } catch (e) {
-      console.log(e)
-      setResponse({ isLoading: false, isError: true, error: e })
+      console.log(e);
+      setResponse({ isLoading: false, isError: true, error: e });
     }
-  }
+  };
 
   const logout = () => {
-    handleLogout()
-    navigate('/login')
-  }
+    handleLogout();
+    navigate("/login");
+  };
 
   return {
     isLoading: response.isLoading,
@@ -40,8 +51,9 @@ const useAuth = () => {
     createUser,
     getUser,
     isLoggedIn,
-    logout
-  }
-}
+    isAdmin,
+    logout,
+  };
+};
 
-export default useAuth
+export default useAuth;
