@@ -13,7 +13,7 @@ const Users = () => {
 
   useEffect(() => {
     getUsers();
-    return () => {};
+    return () => { };
     // eslint-disable-next-line
   }, []);
 
@@ -33,7 +33,7 @@ const Users = () => {
           <tr>
             <th>الموظف</th>
             <th>الصلاحية</th>
-            <th></th>
+            <th>#</th>
           </tr>
         </thead>
         <tbody>

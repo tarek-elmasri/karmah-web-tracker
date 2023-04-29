@@ -110,6 +110,18 @@ const useApi = (initialData = null) => {
     }
   };
 
+  const getUser = async (userId) => {
+    try {
+      setIsLoading();
+      const { data } = await userServices.getUser(userId);
+      setResponseSuccess(data);
+    } catch (e) {
+      console.log(e);
+      setResponseError(e);
+    }
+  }
+
+
   return {
     isLoading: response.isLoading,
     isError: response.isError,
@@ -122,7 +134,9 @@ const useApi = (initialData = null) => {
     createAccount,
     getUsers,
     createUser,
+    getUser
   };
 };
+
 
 export default useApi;
